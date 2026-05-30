@@ -1,8 +1,8 @@
 # Aegis Pro: A Physics-Informed AI Platform for Non-Intrusive Elderly Fall Detection 🛡️👵
 
-[![Paper Status: Accepted](https://img.shields.io/badge/Paper-Accepted--ICRAIQ2IT--2026-brightgreen)](https://github.com/your-username/aegis-pro)
-[![Publisher: Taylor & Francis](https://img.shields.io/badge/Publisher-Taylor%20%26%20Francis%20%28UK%29-blue)](https://github.com/your-username/aegis-pro)
-[![Indexing: Scopus](https://img.shields.io/badge/Indexing-Scopus-orange)](https://github.com/your-username/aegis-pro)
+[![Paper Status: Accepted](https://img.shields.io/badge/Paper-Accepted--ICRAIQ2IT--2026-brightgreen)](#)
+[![Publisher: Taylor & Francis](https://img.shields.io/badge/Publisher-Taylor%20%26%20Francis%20%28UK%29-blue)](#)
+[![Indexing: Scopus](https://img.shields.io/badge/Indexing-Scopus-orange)](#)
 [![Python Version](https://img.shields.io/badge/python-3.9%2B-blue.svg)](https://www.python.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
@@ -10,73 +10,55 @@ Aegis Pro is a zero-wearable, physics-informed computer vision framework designe
 
 ---
 
-## 🚀 Key Innovations & Features
+## 📖 Table of Contents
+1. [Core Philosophy & Technical Innovations](#-core-philosophy--technical-innovations)
+2. [Mathematical Formulations](#-mathematical-formulations)
+3. [System Architecture](#-system-architecture)
+4. [Data & Control Flow](#-data--control-flow)
+5. [Software Requirements & Dependency Installation](#-software-requirements--dependency-installation)
+6. [Step-by-Step Execution & Deployment Guide](#-step-by-step-execution--deployment-guide)
+7. [Audio Alert System (Winsound Deep-Dive)](#-audio-alert-system-winsound-deep-dive)
+8. [Publication & Academic Context](#-publication--academic-context)
+9. [Defensive Q&A for Presentation Prep](#-defensive-qa-for-presentation-prep)
+10. [License & Citation](#-license--citation)
 
-* **Zero-Wearable Bio-Monitoring:** Removes the physical discomfort and reliability issues of smartwatches or pendants. Monitors purely through an ambient camera stream.
-* **Physics-Informed DCTP Engine:** Calculates real-time **Velocity ($V$)** and **Jerk Metrics ($J = \Delta a / \Delta t$)** to capture the actual kinetic signature of a mechanical impact ("thud"), differentiating a violent fall from a controlled sitting down action.
+---
+
+## 🚀 Core Philosophy & Technical Innovations
+
+* **Zero-Wearable Bio-Monitoring:** Removes the physical discomfort, charging requirements, and reliability issues of smartwatches or pendants. Monitoring happens completely passively through an ambient camera stream.
+* **Physics-Informed DCTP Engine:** Calculates real-time **Velocity ($V$)** and **Jerk Metrics ($J$)** to capture the actual kinetic signature of a mechanical impact ("thud"), differentiating a violent fall from a controlled sitting down action.
 * **Floor Persistence Logic:** A custom caching state-machine that "remembers" the patient's critical state if body landmarks are obscured or lost near the floor plane ($S_y > 0.65$).
-* **Multi-Tier Local Audio Alerts:** Driven by low-latency native Windows `winsound` architecture:
-    * *Level 1:* Soft rhythmic warning beeps for hazardous states (e.g., severe bending).
-    * *Level 2:* High-intensity emergency siren for verified critical falls.
 * **Asynchronous Dual-Threaded Response:** Network (SMTP-SSL email) and hardware audio pipelines run completely decoupled from the main vision stream, ensuring 0% frame-rate drop during emergency dispatches.
 * **Automatic Clinical Telemetry:** Aggregates real-time tilt angles, acceleration, and tracking statuses into millisecond-accurate Excel sheets (`Session_ID.xlsx`) and plots Seaborn analytics dashboards automatically at session end.
 
 ---
 
-🛠️ Software & Dependency Requirements
-The platform is optimized to run locally on an edge device or standard system with Python 3.9+:
+## 🧮 Mathematical Formulations
 
-command:
-pip install opencv-python mediapipe face_recognition pandas matplotlib seaborn python-dotenv
+To make the system computationally lean and predictable, Aegis Pro maps its vision data straight to fundamental kinematic principles.
 
-Data Flow Diagram (DFD)
-Traces the physical data lifecycle from initial environmental exposure to log filing:
-graph LR
-    Video[Webcam Video Input] --> Perception[Perception Layer: MediaPipe & dlib]
-    Perception --> Motion[Motion Analysis: Velocity & Jerk]
-    Motion --> Classify[State Classification]
-    Classify --> Output[Alert Output Generation]
-    Output --> Log[Display HUD & Log Excel]
+### 1. The Proximity Boundary
+The camera reads the patient on a standardized $(x, y)$ coordinate plane mapped from $0$ (top) to $1$ (bottom). The vertical position of their torso ($S_y$) acts as the floor boundary check:
+$$\text{Is Near Floor} = (S_y > 0.65)$$
 
-Control Flow Diagram (CFD)
-Illustrates how the operational state cycle remains responsive through iterative loops:
+### 2. Calculating Instantaneous Motion (Velocity)
+To distinguish between static leaning and live falling, the system calculates vertical velocity ($V$) as the change in position over time ($t$):
+$$V = \frac{\Delta y}{\Delta t}$$
 
-graph TD
-    Monitor[1. Monitor Movement] --> Analyze[2. Analyze Kinetic Parameters]
-    Analyze --> Decide[3. Decide Threat Urgency]
-    Decide --> Execute[4. Execute Alarms / SMTP Threads]
-    Execute --> Update[5. Update Cache States]
-    Update --> Monitor
+### 3. Measuring Impact Severity (The Jerk Metric)
+Jerk ($J$) measures the rate of change of acceleration ($a$). A sudden structural crash against the ground results in a severe kinetic spike distinct from normal human mechanics:
+$$J = \frac{\Delta a}{\Delta t} = \frac{\Delta^2 V}{\Delta t^2}$$
 
-🏎️ Step-by-Step Execution & Deployment Guide
-1. Registry & Directory Configuration
-Set up a folder named /encodings in your root file tree and insert clear baseline reference images of target patients.
+### 4. Mathematical Trigger Condition
+The **Decision-Tree Control Process (DCTP)** evaluates a structural Boolean tree before dispatching emergency sirens:
+$$\text{Trigger Alert} = (\text{Torso Angle} > 75^\circ) \land (S_y > 0.65) \land (J > J_{\text{threshold}})$$
 
-Update your local user database file named patients.json with appropriate recipient parameters:
-{
-  "patient_01": {
-    "name": "John Doe",
-    "emergency_contact": "caregiver@domain.com"
-  }
-}
+---
 
-2. Launching the App
-Kickstart the execution script right from your command line:
-python aegis_pro_main.py
+## 📊 System Architecture
 
-Biometric Initialization: Face the camera stream immediately to establish a biometric session lock and parse target patients.json details.Live Assessment: The real-time Bio-Telemetry HUD will overlay instantly, visualizing moving vector magnitudes, angles ($\theta$), and signal persistence timers.Graceful Termination: Press the q key on your keyboard to drop the video capture matrix loops smoothly without destroying transient files.
-
-3. Reviewing Telemetry Logs
-Once stopped, check your local directories for auto-generated payloads:
-
-/logs/Session_XYZ.xlsx: Detailed millisecond-level step datasets documenting raw joint spatial coordinates.
-
-/analytics/Analytics_XYZ.png: Generated Seaborn summary visual charts displaying historical velocity curves and event timelines.
-
-🔊 Audio Alert System (Winsound Deep-Dive)
-Aegis Pro integrates a zero-dependency, ultra-low latency internal audio dispatch machine powered natively via the Windows winsound API.
-
-Multi-Tier Warning StructureTo bypass screen dependencies for immediate notification, the system routes tasks asynchronously on secondary worker threads using the following operational thresholds:Level 0: Safe StateSymptom: Normal daily activities.Action: Complete operational silence; regular system telemetry monitoring.Level 1: Hazardous Warning (Severe Bending)Symptom: System observes Torso angle passing $75^\circ$ but height metrics stay elevated above the floor threshold ($S_y < 0.65$).Action: Triggers slow, repetitive soft warnings (winsound.Beep(800, 300)) to signal room caretakers.Level 2: Critical Emergency Alert (Verified Fall)Symptom: Impact parameters validate alongside floor boundary breaches, or tracking fails inside the danger zone for more than 15 consecutive seconds.Action: Dispatches a high-frequency continuous distress emergency siren (winsound.Beep(2500, 1200)) while generating the primary thread SMTP transmission request concurrently.🔬 Publication & Academic ContextConference: The 4th International Conference on Recent Advancements in Artificial Intelligence, Quantum Intelligence, and Inclusive Technologies (ICRAIQ2IT-2026)Host Institution: NRI Institute of Technology, Vijayawada, India [May 08–09, 2026]Indexing & Press: Scopus-indexed proceedings curated and distributed by Taylor & Francis, UK.Societal Domain Alignment: Directly maps to United Nations Sustainable Development Goal 3 (SDG 3: Good Health and Well-being) by actively dropping long-lie immobilization delays for isolated older populations.Development Metrics: Built using industry-standard Agile-SCRUM methodology, successfully validating functional engineering goals at Technology Readiness Level 4 (TRL 4).
+The software operates on an organized 4-Tier modular framework to secure lightning-fast local performance:
 
 ```mermaid
 graph TD
@@ -106,3 +88,16 @@ graph TD
 
     K & L --> Q[Data Archiver: Pandas/Excel]
 
+graph LR
+    Video[Webcam Video Input] --> Perception[Perception Layer: MediaPipe & dlib]
+    Perception --> Motion[Motion Analysis: Velocity & Jerk]
+    Motion --> Classify[State Classification]
+    Classify --> Output[Alert Output Generation]
+    Output --> Log[Display HUD & Log Excel]
+
+graph TD
+    Monitor[1. Monitor Movement] --> Analyze[2. Analyze Kinetic Parameters]
+    Analyze --> Decide[3. Decide Threat Urgency]
+    Decide --> Execute[4. Execute Alarms / SMTP Threads]
+    Execute --> Update[5. Update Cache States]
+    Update --> Monitor

@@ -87,17 +87,3 @@ graph TD
     end
 
     K & L --> Q[Data Archiver: Pandas/Excel]
-
-graph LR
-    Video[Webcam Video Input] --> Perception[Perception Layer: MediaPipe & dlib]
-    Perception --> Motion[Motion Analysis: Velocity & Jerk]
-    Motion --> Classify[State Classification]
-    Classify --> Output[Alert Output Generation]
-    Output --> Log[Display HUD & Log Excel]
-
-graph TD
-    Monitor[1. Monitor Movement] --> Analyze[2. Analyze Kinetic Parameters]
-    Analyze --> Decide[3. Decide Threat Urgency]
-    Decide --> Execute[4. Execute Alarms / SMTP Threads]
-    Execute --> Update[5. Update Cache States]
-    Update --> Monitor

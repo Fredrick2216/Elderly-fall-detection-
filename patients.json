@@ -1,0 +1,17 @@
+{
+  "PATIENT_01": {
+    "name": "Mary",
+    "staff_emails": ["leonardfredrick2203@gmail.com"],
+    "relatives": [
+      {"name": "Leo (Grandson)", "email": "leonardfredrick2203@gmail.com"},
+      {"name": "Sheeba Daniel(mother)", "email": "sheeba.dany@gmail.com"}
+    ]
+  },
+  "PATIENT_02": {
+    "name": "Murugan",
+    "staff_emails": ["sg5771@srmist.edu.in"],
+    "relatives": [
+      {"name": "Nitin(Grandson)", "email": "jm8101@srmist.edu.in"}
+    ]
+  }
+}
